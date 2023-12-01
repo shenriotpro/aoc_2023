@@ -12,3 +12,7 @@ target/
 
 # MSVC Windows builds of rustc generate these, which store debugging information
 *.pdb
+
+# Custom
+# Let's not leak our session key
+session.txt
