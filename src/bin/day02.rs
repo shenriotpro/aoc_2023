@@ -2,11 +2,17 @@ use std::cmp::max;
 use std::collections::HashMap;
 use std::fs;
 
+use lazy_static::lazy_static;
 use regex::Regex;
 
+lazy_static! {
+    static ref ID_RE: Regex = Regex::new(r"Game (\d+): ").expect("Should be a valid regex");
+    static ref DRAWS_RE: Regex =
+        Regex::new(r"(?<n>\d+) (?<color>red|green|blue)").expect("Should be a valid regex");
+}
+
 fn get_id(line: &str) -> i32 {
-    let re = Regex::new(r"Game (\d+): ").expect("Should be a valid regex");
-    let caps = re.captures(line).expect("Should find a game id");
+    let caps = ID_RE.captures(line).expect("Should find a game id");
     caps.get(1)
         .expect("Should find an id")
         .as_str()
@@ -15,64 +21,58 @@ fn get_id(line: &str) -> i32 {
 }
 
 fn get_draws(line: &str) -> Vec<Vec<(i32, String)>> {
-    let mut res = vec![];
     let (_, game) = line.split_once(": ").expect("Should be a valid game");
-    for draw in game.split("; ") {
-        res.push(vec![]);
-        let re = Regex::new(r"(?<n>\d+) (?<color>red|green|blue)").unwrap();
-        for group in re.captures_iter(draw) {
-            let n = group["n"].parse::<i32>().unwrap();
-            let color = group["color"].to_string().clone();
-            res.last_mut()
-                .expect("Result should not be empty")
-                .push((n, color))
-        }
-    }
-    res
+    game.split("; ")
+        .map(|draw| {
+            DRAWS_RE
+                .captures_iter(draw)
+                .map(|group| {
+                    let n = group["n"].parse::<i32>().expect("Should be a valid number");
+                    let color = group["color"].to_string().clone();
+                    (n, color)
+                })
+                .collect::<Vec<_>>()
+        })
+        .collect::<Vec<_>>()
 }
 
 fn part1(input: &str) -> i32 {
     let max_possible = HashMap::from([("red", 12), ("green", 13), ("blue", 14)]);
-    let mut res = 0;
-    for line in input.lines() {
-        let mut possible = true;
-        'outer: for draw in get_draws(line) {
-            for (n, color) in draw {
-                if n > *max_possible
-                    .get(&color.as_str())
-                    .expect("Should be a valid color")
-                {
-                    possible = false;
-                    break 'outer;
-                }
-            }
-        }
-        if possible {
-            res += get_id(line);
-        }
-    }
-    res
+    input
+        .lines()
+        .filter(|line| {
+            get_draws(line).iter().all(|draw| {
+                draw.iter().all(|(n, color)| {
+                    n <= max_possible
+                        .get(&color.as_str())
+                        .expect("Should be a valid color")
+                })
+            })
+        })
+        .map(get_id)
+        .sum()
 }
 
 fn part2(input: &str) -> i64 {
     // Note that the result may be fairly large.
-    let mut res = 0;
-    for line in input.lines() {
-        let mut min_possible = HashMap::from([
-            ("red".to_string(), 0i64),
-            ("green".to_string(), 0i64),
-            ("blue".to_string(), 0i64),
-        ]);
-        for draw in get_draws(line) {
-            for (n, color) in draw {
-                min_possible
-                    .entry(color)
-                    .and_modify(|e| *e = max(*e, n.into()));
+    input
+        .lines()
+        .map(|line| {
+            let mut min_possible = HashMap::from([
+                ("red".to_string(), 0i64),
+                ("green".to_string(), 0i64),
+                ("blue".to_string(), 0i64),
+            ]);
+            for draw in get_draws(line) {
+                for (n, color) in draw {
+                    min_possible
+                        .entry(color)
+                        .and_modify(|e| *e = max(*e, n.into()));
+                }
             }
-        }
-        res += min_possible.values().product::<i64>();
-    }
-    res
+            min_possible.values().product::<i64>()
+        })
+        .sum()
 }
 
 fn main() {
