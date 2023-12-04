@@ -16,3 +16,6 @@ target/
 # Custom
 # Let's not leak our session key
 session.txt
+
+# https://www.reddit.com/r/adventofcode/wiki/faqs/copyright/inputs/
+data/
