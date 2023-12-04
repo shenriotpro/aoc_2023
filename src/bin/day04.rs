@@ -3,7 +3,12 @@ use std::{
     fs,
 };
 
+use lazy_static::lazy_static;
 use regex::Regex;
+
+lazy_static! {
+    static ref RE: Regex = Regex::new(r"\d+").expect("Should be a valid regex");
+}
 
 fn part1(input: &str) -> i64 {
     input
@@ -15,14 +20,13 @@ fn part1(input: &str) -> i64 {
 }
 
 fn parse_game(line: &str) -> (Vec<i64>, Vec<i64>) {
-    let re = Regex::new(r"\d+").expect("Should be a valid regex");
     let (_, game) = line.split_once(": ").expect("Should be a valid game");
     let (winning, mine) = game.split_once(" | ").expect("Should be a valid game");
-    let winning = re
+    let winning = RE
         .find_iter(winning)
         .map(|m| m.as_str().parse().expect("Should be a valid integer"))
         .collect();
-    let mine = re
+    let mine = RE
         .find_iter(mine)
         .map(|m| m.as_str().parse().expect("Should be a valid integer"))
         .collect();
