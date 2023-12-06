@@ -1,11 +1,12 @@
 use std::{fs, iter::zip};
 
+use aoc_2023::split_parse;
 use itertools::Itertools;
 
 fn part1(input: &str) -> i64 {
     let mut lines = input.lines();
-    let times = get_ints(lines.next().expect("There should be a first line"));
-    let distances = get_ints(lines.next().expect("There should be a second line"));
+    let times = split_parse(lines.next().expect("There should be a first line"));
+    let distances = split_parse(lines.next().expect("There should be a second line"));
 
     zip(times, distances)
         .map(|(t, d)| {
@@ -22,8 +23,8 @@ fn simulate_push(push_time: i64, total_time: i64) -> i64 {
 
 fn part2(input: &str) -> i64 {
     let mut lines = input.lines();
-    let times = get_ints(lines.next().expect("There should be a first line"));
-    let distances = get_ints(lines.next().expect("There should be a second line"));
+    let times = split_parse::<i64>(lines.next().expect("There should be a first line"));
+    let distances = split_parse::<i64>(lines.next().expect("There should be a second line"));
 
     let time = times
         .iter()
@@ -41,13 +42,6 @@ fn part2(input: &str) -> i64 {
     (0..=time)
         .filter(|push_t| simulate_push(*push_t, time) > distance)
         .count() as i64
-}
-
-fn get_ints(s: &str) -> Vec<i64> {
-    s.split_whitespace()
-        .map(|s| s.parse())
-        .filter_map(Result::ok)
-        .collect()
 }
 
 fn main() {
