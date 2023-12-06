@@ -1,12 +1,12 @@
 use std::{fs, str::FromStr};
 
+use aoc_2023::split_parse;
 use gcollections::ops::{bounded::Bounded, Difference, Intersection, Union};
 use interval::{interval_set::ToIntervalSet, IntervalSet};
 use lazy_static::lazy_static;
 use regex::Regex;
 
 lazy_static! {
-    static ref SEED1_RE: Regex = Regex::new(r"\d+").expect("Should be a valid regex");
     static ref SEED2_RE: Regex = Regex::new(r"(\d+) (\d+)").expect("Should be a valid regex");
     static ref ENTRY_RE: Regex = Regex::new(r"(?<destination>\d+) (?<source>\d+) (?<length>\d+)")
         .expect("Should be a valid regex");
@@ -109,12 +109,7 @@ impl FromStr for Seeds1 {
     type Err = ParseSeeds1Error;
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
-        let matches = SEED1_RE.find_iter(s);
-
-        let mut data = vec![];
-        for m in matches {
-            data.push(m.as_str().parse::<i64>().map_err(|_| ParseSeeds1Error)?);
-        }
+        let data = split_parse(s);
 
         Ok(Seeds1 { data })
     }
