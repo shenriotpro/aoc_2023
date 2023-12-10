@@ -4,6 +4,7 @@ use std::{
 };
 
 use itertools::Itertools;
+use aoc_2023::{parse_grid, grid_find, grid_down, grid_up, grid_left, grid_right};
 
 fn part1(input: &str) -> i64 {
     let grid = parse_grid(input);
@@ -176,88 +177,6 @@ fn update_crossings(prev_crossings: i64, prev_open: char, lc: char) -> (i64, cha
         (_, 'L') => (prev_crossings, 'L'),
         (_, 'F') => (prev_crossings, 'F'),
         _ => (prev_crossings, prev_open),
-    }
-}
-
-fn parse_grid(input: &str) -> Vec<Vec<char>> {
-    input.lines().map(|l| l.chars().collect()).collect()
-}
-
-fn grid_find<T: PartialEq>(grid: &Vec<Vec<T>>, hay: T) -> Option<(usize, usize)> {
-    (0..grid.len())
-        .flat_map(|i| (0..grid[0].len()).map(move |j| (i, j)))
-        .find(|(i, j)| grid[*i][*j] == hay)
-}
-
-fn grid_down<T: PartialEq + Copy>(
-    grid: &Vec<Vec<T>>,
-    start: (usize, usize),
-) -> Option<((usize, usize), T)> {
-    let (i, j) = start;
-    let i = i as i64;
-    let j = j as i64;
-    let n = grid.len() as i64;
-    let m = grid[0].len() as i64;
-    let ni = i + 1;
-    let nj = j;
-    if ni >= 0 && ni < n && nj >= 0 && nj < m {
-        Some(((ni as usize, nj as usize), grid[ni as usize][nj as usize]))
-    } else {
-        None
-    }
-}
-
-fn grid_up<T: PartialEq + Copy>(
-    grid: &Vec<Vec<T>>,
-    start: (usize, usize),
-) -> Option<((usize, usize), T)> {
-    let (i, j) = start;
-    let i = i as i64;
-    let j = j as i64;
-    let n = grid.len() as i64;
-    let m = grid[0].len() as i64;
-    let ni = i - 1;
-    let nj = j;
-    if ni >= 0 && ni < n && nj >= 0 && nj < m {
-        Some(((ni as usize, nj as usize), grid[ni as usize][nj as usize]))
-    } else {
-        None
-    }
-}
-
-fn grid_left<T: PartialEq + Copy>(
-    grid: &Vec<Vec<T>>,
-    start: (usize, usize),
-) -> Option<((usize, usize), T)> {
-    let (i, j) = start;
-    let i = i as i64;
-    let j = j as i64;
-    let n = grid.len() as i64;
-    let m = grid[0].len() as i64;
-    let ni = i;
-    let nj = j - 1;
-    if ni >= 0 && ni < n && nj >= 0 && nj < m {
-        Some(((ni as usize, nj as usize), grid[ni as usize][nj as usize]))
-    } else {
-        None
-    }
-}
-
-fn grid_right<T: PartialEq + Copy>(
-    grid: &Vec<Vec<T>>,
-    start: (usize, usize),
-) -> Option<((usize, usize), T)> {
-    let (i, j) = start;
-    let i = i as i64;
-    let j = j as i64;
-    let n = grid.len() as i64;
-    let m = grid[0].len() as i64;
-    let ni = i;
-    let nj = j + 1;
-    if ni >= 0 && ni < n && nj >= 0 && nj < m {
-        Some(((ni as usize, nj as usize), grid[ni as usize][nj as usize]))
-    } else {
-        None
     }
 }
 

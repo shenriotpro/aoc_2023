@@ -2,6 +2,7 @@ use std::{fs, str::FromStr};
 
 use aoc_2023::split_parse;
 use gcollections::ops::{bounded::Bounded, Difference, Intersection, Union};
+// TODO: refactor, probably using points instead of intervals
 use interval::{interval_set::ToIntervalSet, IntervalSet};
 use lazy_static::lazy_static;
 use regex::Regex;
