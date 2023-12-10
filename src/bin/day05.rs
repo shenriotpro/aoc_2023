@@ -1,9 +1,7 @@
 use std::{fs, str::FromStr};
 
 use aoc_2023::split_parse;
-use gcollections::ops::{bounded::Bounded, Difference, Intersection, Union};
-// TODO: refactor, probably using points instead of intervals
-use interval::{interval_set::ToIntervalSet, IntervalSet};
+use itertools::Itertools;
 use lazy_static::lazy_static;
 use regex::Regex;
 
@@ -32,19 +30,6 @@ impl Map {
             }
         }
         source
-    }
-
-    fn apply_range(&self, source_range: &IntervalSet<i64>) -> IntervalSet<i64> {
-        let mut remaining = source_range.clone();
-        let mut res = vec![].to_interval_set();
-        for entry in &self.data {
-            let set = vec![(entry.source, entry.source + entry.length - 1)].to_interval_set();
-            let intersection = remaining.intersection(&set);
-            remaining = remaining.difference(&intersection);
-            let intersection = intersection + (entry.destination - entry.source);
-            res = res.union(&intersection);
-        }
-        res.union(&remaining)
     }
 }
 
@@ -91,16 +76,44 @@ fn part2(input: &str) -> i64 {
         .map(|section| section.parse::<Map>().expect("Should be able to parse map"))
         .collect::<Vec<_>>();
 
-    let mut range: IntervalSet<i64> = vec![].to_interval_set();
-    for seed in seeds.data {
-        range = range.union(&vec![(seed.0, seed.0 + seed.1 - 1)].to_interval_set());
+    let mut bounds = seeds
+        .data
+        .iter()
+        .flat_map(|(b, n)| [*b, *b + *n])
+        .collect_vec();
+
+    for (i, map) in maps.iter().enumerate() {
+        let new_bounds = map
+            .data
+            .iter()
+            .flat_map(|e| [e.source, e.source + e.length])
+            .filter(|x| is_reachable(*x, &seeds, &maps[..i]))
+            .collect_vec();
+        bounds.extend(new_bounds);
+        bounds = bounds.iter().map(|x| map.apply(*x)).collect_vec();
     }
 
-    for map in maps {
-        range = map.apply_range(&range);
-    }
+    *bounds.iter().min().expect("Should have a result")
+}
 
-    range.lower()
+fn is_reachable(goal: i64, seeds: &Seeds2, maps: &[Map]) -> bool {
+    if maps.is_empty() {
+        seeds.data.iter().any(|(b, n)| goal >= *b && goal < *b + *n)
+    } else {
+        let map = maps.last().expect("Should have a map");
+        let mut sources = map
+            .data
+            .iter()
+            .filter(|e| goal >= e.destination && goal < e.destination + e.length)
+            .map(|e| goal - (e.destination - e.source))
+            .collect_vec();
+        if sources.is_empty() {
+            sources = vec![goal];
+        }
+        sources
+            .iter()
+            .any(|s| is_reachable(*s, seeds, &maps[..maps.len() - 1]))
+    }
 }
 
 #[derive(Debug, PartialEq, Eq)]

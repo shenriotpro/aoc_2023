@@ -3,8 +3,8 @@ use std::{
     fs,
 };
 
+use aoc_2023::{grid_down, grid_find, grid_left, grid_right, grid_up, parse_grid};
 use itertools::Itertools;
-use aoc_2023::{parse_grid, grid_find, grid_down, grid_up, grid_left, grid_right};
 
 fn part1(input: &str) -> i64 {
     let grid = parse_grid(input);

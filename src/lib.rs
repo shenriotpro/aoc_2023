@@ -100,7 +100,7 @@ pub fn grid_right<T: PartialEq + Copy>(
 
 #[cfg(test)]
 mod tests {
-    use super::{split_parse, parse_grid, grid_find, grid_down, grid_up, grid_left, grid_right};
+    use super::{grid_down, grid_find, grid_left, grid_right, grid_up, parse_grid, split_parse};
 
     #[test]
     fn test_split_parse_empty() {
