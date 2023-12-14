@@ -10,7 +10,10 @@ struct Record {
 
 fn part1(input: &str) -> i64 {
     let records = input.lines().map(parse_line).collect_vec();
-    records.iter().map(combinations).sum()
+    records
+        .iter()
+        .map(|record| combinations(record.mask.clone(), record.groups.clone()))
+        .sum()
 }
 
 fn parse_line(line: &str) -> Record {
@@ -27,7 +30,7 @@ fn parse_line(line: &str) -> Record {
 }
 
 #[cached]
-fn combinations2(mask: String, groups: Vec<i64>) -> i64 {
+fn combinations(mask: String, groups: Vec<i64>) -> i64 {
     match mask.find('?') {
         None => {
             if matches_exactly(&mask, &groups) {
@@ -49,7 +52,7 @@ fn combinations2(mask: String, groups: Vec<i64>) -> i64 {
                         let groups = groups.clone();
                         new_mask.replace_range(position..position + 1, &c.to_string());
                         if matches_partially(&new_mask, &groups) {
-                            res += combinations2(new_mask, groups);
+                            res += combinations(new_mask, groups);
                         }
                     }
                     res
@@ -58,7 +61,7 @@ fn combinations2(mask: String, groups: Vec<i64>) -> i64 {
                     let start_groups =
                         compute_groups(mask.get(..last).expect("Should be a valid slice"));
                     if groups.starts_with(&start_groups) {
-                        combinations2(
+                        combinations(
                             mask.get(last + 1..)
                                 .expect("Should be a valid slice")
                                 .to_string(),
@@ -73,56 +76,7 @@ fn combinations2(mask: String, groups: Vec<i64>) -> i64 {
     }
 }
 
-fn combinations(record: &Record) -> i64 {
-    let r = combinations_backtrack(&record.mask, 0, &record.groups);
-    println!("{}: {}", record.mask, r);
-    r
-}
-
-fn combinations_backtrack(mask: &String, position: usize, groups: &[i64]) -> i64 {
-    // TODO: we should probably check chars' len
-    if position == mask.len() {
-        if matches_exactly(mask, groups) {
-            1
-        } else {
-            0
-        }
-    } else if mask
-        .chars()
-        .nth(position)
-        .expect("Should be a valid position")
-        != '?'
-    {
-        combinations_backtrack(mask, position + 1, groups)
-    } else {
-        let mut res = 0;
-        for c in ['.', '#'] {
-            let mut new_mask = mask.clone();
-            new_mask.replace_range(position..position + 1, &c.to_string());
-            if matches_partially(&new_mask, groups) {
-                res += combinations_backtrack(&new_mask, position + 1, groups);
-            }
-        }
-        res
-    }
-}
-
 fn matches_partially(mask: &str, groups: &[i64]) -> bool {
-    // if mask.contains('#') {
-    //     let max_group = groups.iter().max().expect("Should have a max");
-    //     // TODO: we should check there is a #
-    //     let current_max = mask
-    //         .chars()
-    //         .group_by(|&c| c)
-    //         .into_iter()
-    //         .filter(|(c, _)| *c == '#')
-    //         .map(|(_, g)| g.count())
-    //         .max()
-    //         .expect("Should have a max");
-    //     if (current_max as i64) > *max_group {
-    //         return false;
-    //     }
-    // }
     let mask_groups = compute_partial_groups(mask);
     if mask_groups.is_empty() {
         return true;
@@ -196,10 +150,7 @@ fn part2(input: &str) -> i64 {
     let records = input.lines().map(parse_line2).collect_vec();
     records
         .iter()
-        .map(|record| {
-            println!("{}", record.mask);
-            combinations2(record.mask.clone(), record.groups.clone())
-        })
+        .map(|record| combinations(record.mask.clone(), record.groups.clone()))
         .sum()
 }
 
