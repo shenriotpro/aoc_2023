@@ -22,6 +22,42 @@ pub fn grid_find<T: PartialEq>(grid: &Vec<Vec<T>>, hay: T) -> Option<(usize, usi
         .find(|(i, j)| grid[*i][*j] == hay)
 }
 
+/// Get the neighbors in a grid (trig order).
+pub fn grid_neighbors8<T: Copy>(
+    grid: &Vec<Vec<T>>,
+    start: (usize, usize),
+) -> Vec<((usize, usize), T)> {
+    let (i, j) = start;
+    let i = i as i64;
+    let j = j as i64;
+    let deltas = [
+        (0, 1),
+        (-1, 1),
+        (-1, 0),
+        (-1, -1),
+        (0, -1),
+        (1, -1),
+        (1, 0),
+        (1, 1),
+    ];
+    deltas
+        .iter()
+        .filter(|(di, dj)| {
+            i + di >= 0
+                && i + di < (grid.len() as i64)
+                && j + dj >= 0
+                && j + dj < (grid[0].len() as i64)
+        })
+        .map(|delta| {
+            let (di, dj) = delta;
+            (
+                ((i + di) as usize, (j + dj) as usize),
+                grid[(i + di) as usize][(j + dj) as usize],
+            )
+        })
+        .collect::<Vec<_>>()
+}
+
 /// Get the element below in a grid.
 pub fn grid_down<T: PartialEq + Copy>(
     grid: &Vec<Vec<T>>,
@@ -100,7 +136,10 @@ pub fn grid_right<T: PartialEq + Copy>(
 
 #[cfg(test)]
 mod tests {
-    use super::{grid_down, grid_find, grid_left, grid_right, grid_up, parse_grid, split_parse};
+    use super::{
+        grid_down, grid_find, grid_left, grid_neighbors8, grid_right, grid_up, parse_grid,
+        split_parse,
+    };
 
     #[test]
     fn test_split_parse_empty() {
@@ -154,6 +193,11 @@ opqrstu";
         assert_eq!(grid_right(&grid, a), Some(((0, 1), 'b')));
         assert_eq!(grid_down(&grid, a), Some(((1, 0), 'h')));
 
+        assert_eq!(
+            grid_neighbors8(&grid, a),
+            vec![((0, 1), 'b'), ((1, 0), 'h'), ((1, 1), 'i')]
+        );
+
         let u = grid_find(&grid, 'u').expect("Should have found u");
         assert_eq!(u, (2, 6));
 
@@ -162,6 +206,28 @@ opqrstu";
         assert_eq!(grid_left(&grid, u), Some(((2, 5), 't')));
         assert_eq!(grid_up(&grid, u), Some(((1, 6), 'n')));
 
+        assert_eq!(
+            grid_neighbors8(&grid, u),
+            vec![((1, 6), 'n'), ((1, 5), 'm'), ((2, 5), 't')]
+        );
+
         assert_eq!(grid_find(&grid, 'z'), None);
+
+        let i = grid_find(&grid, 'i').expect("Should have found i");
+        assert_eq!(i, (1, 1));
+
+        assert_eq!(
+            grid_neighbors8(&grid, i),
+            vec![
+                ((1, 2), 'j'),
+                ((0, 2), 'c'),
+                ((0, 1), 'b'),
+                ((0, 0), 'a'),
+                ((1, 0), 'h'),
+                ((2, 0), 'o'),
+                ((2, 1), 'p'),
+                ((2, 2), 'q')
+            ]
+        );
     }
 }

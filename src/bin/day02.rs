@@ -11,31 +11,6 @@ lazy_static! {
         Regex::new(r"(?<n>\d+) (?<color>red|green|blue)").expect("Should be a valid regex");
 }
 
-fn get_id(line: &str) -> i32 {
-    let caps = ID_RE.captures(line).expect("Should find a game id");
-    caps.get(1)
-        .expect("Should find an id")
-        .as_str()
-        .parse::<i32>()
-        .expect("Should be a valid number")
-}
-
-fn get_draws(line: &str) -> Vec<Vec<(i32, String)>> {
-    let (_, game) = line.split_once(": ").expect("Should be a valid game");
-    game.split("; ")
-        .map(|draw| {
-            DRAWS_RE
-                .captures_iter(draw)
-                .map(|group| {
-                    let n = group["n"].parse::<i32>().expect("Should be a valid number");
-                    let color = group["color"].to_string().clone();
-                    (n, color)
-                })
-                .collect::<Vec<_>>()
-        })
-        .collect::<Vec<_>>()
-}
-
 fn part1(input: &str) -> i32 {
     let max_possible = HashMap::from([("red", 12), ("green", 13), ("blue", 14)]);
     input
@@ -73,6 +48,31 @@ fn part2(input: &str) -> i64 {
             min_possible.values().product::<i64>()
         })
         .sum()
+}
+
+fn get_id(line: &str) -> i32 {
+    let caps = ID_RE.captures(line).expect("Should find a game id");
+    caps.get(1)
+        .expect("Should find an id")
+        .as_str()
+        .parse::<i32>()
+        .expect("Should be a valid number")
+}
+
+fn get_draws(line: &str) -> Vec<Vec<(i32, String)>> {
+    let (_, game) = line.split_once(": ").expect("Should be a valid game");
+    game.split("; ")
+        .map(|draw| {
+            DRAWS_RE
+                .captures_iter(draw)
+                .map(|group| {
+                    let n = group["n"].parse::<i32>().expect("Should be a valid number");
+                    let color = group["color"].to_string().clone();
+                    (n, color)
+                })
+                .collect::<Vec<_>>()
+        })
+        .collect::<Vec<_>>()
 }
 
 fn main() {

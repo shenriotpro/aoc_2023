@@ -1,15 +1,34 @@
 use std::fs;
 
+use aoc_2023::{grid_neighbors8, parse_grid};
 use itertools::Itertools;
 
 fn part1(input: &str) -> i64 {
-    let grid = input
-        .lines()
-        .map(|line| line.chars().collect::<Vec<_>>())
-        .collect::<Vec<_>>();
+    let grid = parse_grid(input);
+
     grid.iter()
         .enumerate()
         .map(|(i, line)| line_sum(i, line, &grid))
+        .sum()
+}
+
+fn part2(input: &str) -> i64 {
+    let grid = parse_grid(input);
+
+    let (numbers, numbers_grid) = find_numbers(&grid);
+    grid.iter()
+        .enumerate()
+        .flat_map(|(i, line)| line.iter().enumerate().map(move |(j, c)| (i, j, *c)))
+        .filter(|(_, _, c)| *c == '*')
+        .map(|(i, j, _)| {
+            grid_neighbors8(&numbers_grid, (i, j))
+                .iter()
+                .filter_map(|(_, n)| *n)
+                .unique()
+                .collect_vec()
+        })
+        .filter(|neis| neis.len() == 2)
+        .map(|neis| numbers[neis[0]] * numbers[neis[1]])
         .sum()
 }
 
@@ -22,9 +41,9 @@ fn line_sum(i: usize, line: &[char], grid: &Vec<Vec<char>>) -> i64 {
             cur_part *= 10;
             cur_part += c.to_digit(10).expect("Should be a valid digit") as i64;
             if !cur_valid
-                && neighbors(i as i32, j as i32, grid)
+                && grid_neighbors8(grid, (i, j))
                     .iter()
-                    .any(|c| *c != '.' && !c.is_ascii_digit())
+                    .any(|(_, c)| *c != '.' && !c.is_ascii_digit())
             {
                 cur_valid = true;
             }
@@ -41,54 +60,6 @@ fn line_sum(i: usize, line: &[char], grid: &Vec<Vec<char>>) -> i64 {
         res += cur_part;
     }
     res
-}
-
-fn neighbors<T: Copy>(i: i32, j: i32, grid: &Vec<Vec<T>>) -> Vec<T> {
-    let deltas = [
-        (-1, -1),
-        (-1, 0),
-        (-1, 1),
-        (0, -1),
-        (0, 1),
-        (1, -1),
-        (1, 0),
-        (1, 1),
-    ];
-    deltas
-        .iter()
-        .filter(|(di, dj)| {
-            i + di >= 0
-                && i + di < (grid.len() as i32)
-                && j + dj >= 0
-                && j + dj < (grid[0].len() as i32)
-        })
-        .map(|delta| {
-            let (di, dj) = delta;
-            grid[(i + di) as usize][(j + dj) as usize]
-        })
-        .collect::<Vec<_>>()
-}
-
-fn part2(input: &str) -> i64 {
-    let grid = input
-        .lines()
-        .map(|line| line.chars().collect::<Vec<_>>())
-        .collect::<Vec<_>>();
-    let (numbers, numbers_grid) = find_numbers(&grid);
-    grid.iter()
-        .enumerate()
-        .flat_map(|(i, line)| line.iter().enumerate().map(move |(j, c)| (i, j, *c)))
-        .filter(|(_, _, c)| *c == '*')
-        .map(|(i, j, _)| {
-            neighbors(i as i32, j as i32, &numbers_grid)
-                .iter()
-                .filter_map(|n| *n)
-                .unique()
-                .collect_vec()
-        })
-        .filter(|neis| neis.len() == 2)
-        .map(|neis| numbers[neis[0]] * numbers[neis[1]])
-        .sum()
 }
 
 fn find_numbers(grid: &Vec<Vec<char>>) -> (Vec<i64>, Vec<Vec<Option<usize>>>) {
