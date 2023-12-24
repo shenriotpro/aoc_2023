@@ -92,13 +92,7 @@ fn get_neighbors(grid: &Vec<Vec<char>>, position: (usize, usize)) -> Vec<((usize
 // }
 
 fn part2(input: &str) -> i64 {
-    let grid = parse_grid(
-        &input
-            .replace('>', ".")
-            .replace('<', ".")
-            .replace('^', ".")
-            .replace('v', "."),
-    );
+    let grid = parse_grid(&input.replace(['>', '<', '^', 'v'], "."));
 
     // TODO: build a smaller graph?
 

@@ -146,10 +146,8 @@ fn part1(input: &str) -> i64 {
 }
 
 fn parse_module(line: &str) -> Module {
-    if line.starts_with('%') {
-        let (name, dest) = line[1..]
-            .split_once(" -> ")
-            .expect("Should be a valid module");
+    if let Some(module) = line.strip_prefix('%') {
+        let (name, dest) = module.split_once(" -> ").expect("Should be a valid module");
         let name = name.to_string();
         let dest = if dest.contains(", ") {
             dest.split(", ").map(str::to_string).collect_vec()
@@ -161,10 +159,8 @@ fn parse_module(line: &str) -> Module {
             dest,
             on: false,
         })
-    } else if line.starts_with('&') {
-        let (name, dest) = line[1..]
-            .split_once(" -> ")
-            .expect("Should be a valid module");
+    } else if let Some(module) = line.strip_prefix('&') {
+        let (name, dest) = module.split_once(" -> ").expect("Should be a valid module");
         let name = name.to_string();
         let dest = if dest.contains(", ") {
             dest.split(", ").map(str::to_string).collect_vec()

@@ -19,3 +19,5 @@ session.txt
 
 # https://www.reddit.com/r/adventofcode/wiki/faqs/copyright/inputs/
 data/
+
+.vscode/

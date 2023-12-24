@@ -56,11 +56,8 @@ fn intersect(h1: Hail, h2: Hail, bounds: (i64, i64)) -> bool {
     let y = a1 * x + b1;
     let min = bounds.0 as f64;
     let max = bounds.1 as f64;
-    let r = min <= x && x <= max && min <= y && y <= max;
-    // if r {
-    //     println!("{:?} {:?}", h1, h2);
-    // }
-    r
+
+    min <= x && x <= max && min <= y && y <= max
 }
 
 fn compute_ab(h: Hail) -> (f64, f64) {
