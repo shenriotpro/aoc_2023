@@ -2,6 +2,7 @@ use std::fs;
 
 use aoc_2023::split_parse;
 use itertools::Itertools;
+use z3::ast::{self, Ast};
 
 #[derive(Clone, Copy, Debug)]
 struct Hail {
@@ -68,7 +69,49 @@ fn compute_ab(h: Hail) -> (f64, f64) {
 }
 
 fn part2(input: &str) -> i64 {
-    0
+    let hails = input.lines().map(Hail::from).collect::<Vec<_>>();
+
+    let z3_conf = z3::Config::new();
+    let ctx = z3::Context::new(&z3_conf);
+    let solver = z3::Solver::new(&ctx);
+
+    let x = ast::Int::new_const(&ctx, "x");
+    let y = ast::Int::new_const(&ctx, "y");
+    let z = ast::Int::new_const(&ctx, "z");
+    let vx = ast::Int::new_const(&ctx, "vx");
+    let vy = ast::Int::new_const(&ctx, "vy");
+    let vz = ast::Int::new_const(&ctx, "vz");
+
+    for (i, hail) in hails.iter().enumerate() {
+        let xi = ast::Int::from_i64(&ctx, hail.x);
+        let yi = ast::Int::from_i64(&ctx, hail.y);
+        let zi = ast::Int::from_i64(&ctx, hail.z);
+        let vxi = ast::Int::from_i64(&ctx, hail.vx);
+        let vyi = ast::Int::from_i64(&ctx, hail.vy);
+        let vzi = ast::Int::from_i64(&ctx, hail.vz);
+
+        let ti = ast::Int::new_const(&ctx, format!("t{}", i));
+
+        let left = ast::Int::add(&ctx, &[&xi, &ast::Int::mul(&ctx, &[&vxi, &ti])]);
+        let right = ast::Int::add(&ctx, &[&x, &ast::Int::mul(&ctx, &[&vx, &ti])]);
+        solver.assert(&left._eq(&right));
+
+        let left = ast::Int::add(&ctx, &[&yi, &ast::Int::mul(&ctx, &[&vyi, &ti])]);
+        let right = ast::Int::add(&ctx, &[&y, &ast::Int::mul(&ctx, &[&vy, &ti])]);
+        solver.assert(&left._eq(&right));
+
+        let left = ast::Int::add(&ctx, &[&zi, &ast::Int::mul(&ctx, &[&vzi, &ti])]);
+        let right = ast::Int::add(&ctx, &[&z, &ast::Int::mul(&ctx, &[&vz, &ti])]);
+        solver.assert(&left._eq(&right));
+    }
+
+    solver.check();
+    let model = solver.get_model().unwrap();
+    let x = model.eval(&x, true).unwrap().as_i64().unwrap();
+    let y = model.eval(&y, true).unwrap().as_i64().unwrap();
+    let z = model.eval(&z, true).unwrap().as_i64().unwrap();
+
+    x + y + z
 }
 
 fn main() {
