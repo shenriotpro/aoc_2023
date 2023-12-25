@@ -106,10 +106,22 @@ fn part2(input: &str) -> i64 {
     }
 
     solver.check();
-    let model = solver.get_model().unwrap();
-    let x = model.eval(&x, true).unwrap().as_i64().unwrap();
-    let y = model.eval(&y, true).unwrap().as_i64().unwrap();
-    let z = model.eval(&z, true).unwrap().as_i64().unwrap();
+    let model = solver.get_model().expect("Should have a model");
+    let x = model
+        .eval(&x, true)
+        .expect("Should have a value")
+        .as_i64()
+        .expect("Should be an i64");
+    let y = model
+        .eval(&y, true)
+        .expect("Should have a value")
+        .as_i64()
+        .expect("Should be an i64");
+    let z = model
+        .eval(&z, true)
+        .expect("Should have a value")
+        .as_i64()
+        .expect("Should be an i64");
 
     x + y + z
 }

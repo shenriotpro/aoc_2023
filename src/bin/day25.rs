@@ -4,7 +4,7 @@ use itertools::Itertools;
 
 fn part1(input: &str) -> i64 {
     for line in input.lines() {
-        let (src, neighbours) = line.split_once(": ").unwrap();
+        let (src, neighbours) = line.split_once(": ").expect("Should have a colon");
         let neighbours = neighbours.split_whitespace().collect_vec();
         for neighbour in neighbours {
             // dot -Tsvg g.txt > g.svg
@@ -17,24 +17,17 @@ fn part1(input: &str) -> i64 {
     0
 }
 
-fn part2(input: &str) -> String {
-    let mut res = String::new();
-    for line in input.lines() {}
-    res
-}
-
 fn main() {
     let file_path = "data/day25_input.txt";
 
     let input = fs::read_to_string(file_path).expect("Should have been able to read the file");
 
     println!("{}", part1(&input));
-    println!("{}", part2(&input));
 }
 
 #[cfg(test)]
 mod tests {
-    use super::{part1, part2};
+    use super::part1;
 
     #[test]
     fn test_part1() {
@@ -53,13 +46,5 @@ rzs: qnr cmg lsr rsh
 frs: qnr lhk lsr";
 
         assert_eq!(part1(input), 54);
-    }
-
-    #[test]
-    fn test_part2() {
-        let input = "
-";
-
-        assert_eq!(part2(input), "");
     }
 }

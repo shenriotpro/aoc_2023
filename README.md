@@ -12,7 +12,7 @@ An attempt at https://adventofcode.com/2023 in Rust.
 
 `cargo fmt`
 
-`cargo clippy`
+`cargo clippy --all-targets`
 
 `cargo test`
 

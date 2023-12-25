@@ -116,12 +116,13 @@ mod tests {
 .##..##.##.
 ...........";
 
-        // assert_eq!(part2(input, Some(6)), 16);
-        // assert_eq!(part2(input, Some(10)), 50);
-        // assert_eq!(part2(input, Some(50)), 1594);
-        // assert_eq!(part2(input, Some(100)), 6536);
-        // assert_eq!(part2(input, Some(500)), 167004);
-        // assert_eq!(part2(input, Some(1000)), 668697);
-        // assert_eq!(part2(input, Some(5000)), 16733044);
+        // TODO: fix tests
+        assert_eq!(part2(input, Some(6)), 16);
+        assert_eq!(part2(input, Some(10)), 50);
+        assert_eq!(part2(input, Some(50)), 1594);
+        assert_eq!(part2(input, Some(100)), 6536);
+        assert_eq!(part2(input, Some(500)), 167004);
+        assert_eq!(part2(input, Some(1000)), 668697);
+        assert_eq!(part2(input, Some(5000)), 16733044);
     }
 }
