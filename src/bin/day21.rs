@@ -41,8 +41,68 @@ fn get_neighbors(grid: &Vec<Vec<char>>, position: (usize, usize)) -> Vec<(usize,
     res
 }
 
+fn get_neighbors2(grid: &Vec<Vec<char>>, position: (i64, i64)) -> Vec<(i64, i64)> {
+    let mut res = vec![];
+    let (i, j) = position;
+    let n = grid.len() as i64;
+    let m = grid[0].len() as i64;
+    for (neighbor, c) in [(i + 1, j), (i - 1, j), (i, j - 1), (i, j + 1)]
+        .iter()
+        .map(|(ni, nj)| {
+            (
+                (*ni, *nj),
+                grid[ni.rem_euclid(n) as usize][nj.rem_euclid(m) as usize],
+            )
+        })
+    {
+        if c != '#' {
+            res.push(neighbor);
+        }
+    }
+    res
+}
+
+fn part2_small(input: &str, steps: i64) -> i64 {
+    let grid = parse_grid(input);
+
+    let start = grid_find(&grid, 'S').expect("Should have a start");
+    let start = (start.0 as i64, start.1 as i64);
+    let mut seen = HashSet::new();
+    seen.reserve((steps * steps) as usize);
+    let mut queue = VecDeque::new();
+    queue.reserve((steps * steps) as usize);
+    queue.push_back((start, 0));
+    seen.insert(start);
+    let mut res = 0;
+    while !queue.is_empty() {
+        let (position, d) = queue.pop_front().expect("Should have a position");
+        if d % 2 == steps % 2 {
+            res += 1;
+        }
+        if d > steps {
+            break;
+        }
+        if d == steps {
+            continue;
+        }
+        for neighbor in get_neighbors2(&grid, position) {
+            if seen.contains(&neighbor) {
+                continue;
+            }
+            seen.insert(neighbor);
+            queue.push_back((neighbor, d + 1));
+        }
+    }
+
+    res
+}
+
 fn part2(input: &str, steps: Option<i64>) -> i64 {
     let steps = steps.unwrap_or(26501365);
+    // Unfortunately, we have to choose between slow and specialized.
+    if steps <= 5000 {
+        return part2_small(input, steps);
+    }
     let grid = parse_grid(input);
 
     let start = grid_find(&grid, 'S').expect("Should have a start");
@@ -116,7 +176,7 @@ mod tests {
 .##..##.##.
 ...........";
 
-        // TODO: fix tests
+        // TODO: improve perf?
         assert_eq!(part2(input, Some(6)), 16);
         assert_eq!(part2(input, Some(10)), 50);
         assert_eq!(part2(input, Some(50)), 1594);

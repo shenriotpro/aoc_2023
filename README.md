@@ -14,7 +14,7 @@ An attempt at https://adventofcode.com/2023 in Rust.
 
 `cargo clippy --all-targets`
 
-`cargo test`
+`cargo test --release`
 
 ## Running
 
