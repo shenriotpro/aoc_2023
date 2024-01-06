@@ -11,14 +11,14 @@ fn part1(input: &str) -> i64 {
     trench.insert((i, j));
 
     let mut res = 0i64;
-    let mut res2 = 0i64;
+    // let mut res2 = 0i64;
     for line in input.lines() {
         let (dir, steps, _) = line
             .split_whitespace()
             .collect_tuple()
             .expect("Should be a valid triplet");
         let steps = steps.parse::<i64>().expect("Should be a valid number");
-        let (oi, oj) = (i, j);
+        // let (oi, oj) = (i, j);
         for _ in 0..steps {
             match dir {
                 "R" => j += 1,
@@ -33,9 +33,9 @@ fn part1(input: &str) -> i64 {
                 res += 1;
             }
         }
-        res2 += oi * j - oj * i;
+        // res2 += oi * j - oj * i;
     }
-    println!("{}", 2 + res / 2 + res2.abs() / 2);
+    // println!("{}", 2 + res / 2 + res2.abs() / 2);
     let mut queue = VecDeque::new();
     // TODO: lucky guess
     queue.push_back((1, 1));

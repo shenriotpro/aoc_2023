@@ -65,7 +65,7 @@ fn part2(input: &str) -> i64 {
         if !start_node.name.ends_with('A') {
             continue;
         }
-        println!("Trying {}", start_node.name);
+        // println!("Trying {}", start_node.name);
         let mut cache = HashMap::<(String, usize), i64>::new();
         let mut current: &str = &start_node.name;
         let mut steps = 0i64;
@@ -76,7 +76,7 @@ fn part2(input: &str) -> i64 {
             match cached {
                 Some(cached) => {
                     // It looks like the size is always the same as the first Z.
-                    println!("cycle start {} size {}", cached, steps - cached);
+                    // println!("cycle start {} size {}", cached, steps - cached);
                     // How come LCM is sufficient? Probably because of the above.
                     res = num::integer::lcm(res, steps - cached);
                     break;
@@ -92,9 +92,9 @@ fn part2(input: &str) -> i64 {
                 _ => panic!("Should be a valid direction"),
             };
             steps += 1;
-            if current.ends_with('Z') {
-                println!("{}: {}", steps, current);
-            }
+            // if current.ends_with('Z') {
+            //     println!("{}: {}", steps, current);
+            // }
         }
     }
 
