@@ -185,6 +185,20 @@ fn parse_module(line: &str) -> Module {
     }
 }
 
+fn gcd(a: i64, b: i64) -> i64 {
+    if b > a {
+        gcd(b, a)
+    } else if b == 0 {
+        a
+    } else {
+        gcd(b, a % b)
+    }
+}
+
+fn lcm(a: i64, b: i64) -> i64 {
+    a * b / gcd(a, b)
+}
+
 fn part2(input: &str) -> i64 {
     let modules = input.lines().map(parse_module).collect_vec();
     let mut modules: HashMap<String, Module> = modules
@@ -203,6 +217,7 @@ fn part2(input: &str) -> i64 {
         }
     }
 
+    let mut res = 1;
     for i in 1..4000 {
         // println!("{i}");
         let mut queue = VecDeque::new();
@@ -215,7 +230,8 @@ fn part2(input: &str) -> i64 {
         while !queue.is_empty() {
             let pulse = queue.pop_front().expect("Should not be empty");
             if pulse.to == "qt" && pulse.high {
-                println!("{}: {:?}", i, pulse)
+                res = lcm(res, i);
+                // println!("{}: {:?}", i, pulse)
             }
             let to = modules.get_mut(&pulse.to);
             if let Some(to) = to {
@@ -228,7 +244,7 @@ fn part2(input: &str) -> i64 {
         // }
     }
 
-    0
+    res
 }
 
 fn main() {
